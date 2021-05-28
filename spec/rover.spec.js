@@ -47,6 +47,7 @@ describe("Rover class", function() {
    let commands = [new Command('MODE_CHANGE', "LOW_POWER")]
    let message = new Message('Testing MODE_CHANGE', commands)
    let response = rover.receiveMessage(message)
+   expect(rover.mode).toEqual("LOW_POWER");
    expect(response.results[0].completed).toEqual(true);
  });
 //  test12
@@ -55,7 +56,8 @@ describe("Rover class", function() {
     let commands = [new Command('MODE_CHANGE', "LOW_POWER"), new Command("MOVE", 20)]
     let message = new Message('Testing MODE_CHANGE & LOW_POWER', commands)
     let response = rover.receiveMessage(message)
-    expect(response.results[0].completed).toEqual(false);
+    expect(response.results[1].completed).toEqual(false);
+    expect(rover.position).toEqual(98382);
   })
 //   // test13
   it("responds with position for move command", function() {
@@ -63,6 +65,7 @@ describe("Rover class", function() {
     let commands = [new Command("MOVE", 20)];
     let message = new Message('Testing MOVE COMMAND POSITION', commands);
     let response = rover.receiveMessage(message);
+    expect(rover.position).toEqual(20)
     expect(response.results[0].completed).toEqual(true);
   })
 });

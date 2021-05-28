@@ -1,8 +1,8 @@
 class Rover {
-   constructor (position, mode, generatorWatts = 110){
+   constructor (position){
      this.position = position;
      this.mode = "NORMAL";
-     this.generatorWatts = generatorWatts;
+     this.generatorWatts = 110;
    }
    
     receiveMessage(message) {
@@ -22,13 +22,7 @@ class Rover {
       message : message.name,
       results : resultsArray
     }
-    let roverInfo = {
-      roverStatus : {
-        position : this.position,
-        mode : this.mode,
-        generatorWatts: this.generatorWatts
-        }    
-    }
+    
     let status = {
       completed : true
     }
@@ -41,25 +35,35 @@ class Rover {
       if (message["commands"][i]["commandType"] === "STATUS_CHECK") {
         let statusCheck = {
           completed : status.completed,
-          roverStatus : roverInfo.roverStatus
+          roverStatus : {
+            position : this.position,
+            mode : this.mode,
+            generatorWatts: this.generatorWatts
+          }   
         }
         resultsArray.push(statusCheck)
       }
 
-      if (message["commands"][i]["commandType"] === "MODE_CHANGE"){
-        if (message["commands"][i]["value"] === ("LOW_POWER")){
-          roverInfo.roverStatus.mode = "LOW_POWER";
-          resultsArray.push(status)          
-        }
-      }
-
-      if (message["commands"][i]["commandType"] === "MOVE") {
-        if(roverInfo.roverStatus.mode != "NORMAL"){
-          resultsArray.push(status.completed = false);
+      else if (message["commands"][i]["commandType"] === "MODE_CHANGE"){
+        if (message["commands"][i]["value"] === "LOW_POWER"){
+          this.mode = "LOW_POWER";
         }
         else {
-          roverInfo.roverStatus.position = message["commands"][i]["value"];  
-         resultsArray.push(status);
+          this.mode = "NORMAL"
+        }
+        resultsArray.push(status);
+      }
+
+      else if (message["commands"][i]["commandType"] === "MOVE") {
+        if(this.mode != "NORMAL"){
+          let falseStatus = {
+            completed : false
+          }
+          resultsArray.push(falseStatus);
+        }
+        else {
+          this.position = message["commands"][i]["value"];  
+          resultsArray.push(status);
         }        
       }
     }    
